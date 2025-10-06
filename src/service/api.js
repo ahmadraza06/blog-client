@@ -2,11 +2,14 @@
 import axios from 'axios'
 import { API_NOTIFICATION_MESSAGE, SERVICE_URLS } from '../constants/config';
 import { getAccessToken } from '../utils/common-utils';
+import dotenv from 'dotenv'
 
-const API_URL = 'http://localhost:8000'
+
+dotenv.config();
+const VITE_API_URL = import.meta.env.VITE_API_URL ||'http://localhost:8000'
 
 const axiosInstance = axios.create({
-    baseURL:API_URL,
+    baseURL:VITE_API_URL,
     timeout:10000,
     headers:{
         "content-type":"application/json"
