@@ -1,69 +1,143 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 
 export const Navbar = () => {
-  
   const navigate = useNavigate();
-  // setTimeout(() => {
-    
-  //   navigate('/login')
-  // },1000 * 60 * 15);
-  
-  const handleLogOut = ()=>{
-    sessionStorage.setItem('accessToken','')
-    sessionStorage.setItem('refreshToken','')
-    navigate('/login')
-  }
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleLogOut = () => {
+    sessionStorage.setItem("accessToken", "");
+    sessionStorage.setItem("refreshToken", "");
+    navigate("/login");
+  };
+
+  const navItems = ["Home", "About", "Services", "Pricing", "Contact"];
 
   return (
-    <div>
+    <nav className="fixed w-full backdrop-blur-md bg-black/70 shadow-xl z-50 border-b border-gray-800">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+        
+        {/* Logo */}
+        <div className="text-2xl font-bold text-yellow-700 hover:scale-105 transition-transform">
+          <Link to="/">MyBlog</Link>
+        </div>
 
-<nav className="bg-white border-gray-200 dark:bg-gray-900">
-  <div className=" flex  items-center justify-between mx-auto p-4">
-    
-    
-    <div className="  w-full  " id="navbar-default">
-      <div className='flex   w-full justify-between items-conter'>
+        {/* Desktop Nav Links */}
+        <ul className="hidden md:flex space-x-8 font-medium">
+          {navItems.map((item) => {
+            const isActive = location.pathname === `/${item.toLowerCase()}`;
+            return (
+              <li key={item}>
+                <Link
+                  to={`/${item.toLowerCase()=='home'?'':item.toLocaleLowerCase()}`}
+                  className={`relative px-3 py-2 rounded-md group transition-all duration-300
+                    ${isActive ? "text-yellow-400" : "text-gray-200 hover:text-yellow-400"}`}
+                >
+                  <span className="relative z-10">{item}</span>
+                  {/* Active / hover underline */}
+                  <span
+                    className={`absolute left-1/2 bottom-0 h-[2px] bg-yellow-400 transition-all duration-300 
+                    ${isActive ? "w-full left-0" : "w-0 group-hover:w-full group-hover:left-0"}`}
+                  ></span>
+                  {/* Hover subtle glow */}
+                  <span className="absolute inset-0 rounded-md opacity-0 group-hover:opacity-20 
+                                bg-yellow-500/20 blur-sm transition duration-300"></span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
 
-         <ul className="  h-full font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 flex flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-        <li>
-          <Link  to="/" 
-          className="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">
-            Home
-            </Link>
-        </li>
-        <li>
-          <Link to="/about" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-          About</Link>
-        </li>
-        <li>
-          <Link to="/services" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-          Services</Link>
-        </li>
-        <li>
-          <Link to="Pricing" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-          Pricing</Link>
-        </li>
-        <li>
-          <Link to="Contact" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-          Contact</Link>
-        </li>
+        {/* Desktop Log Out Button */}
+        <RunningBorderButton onClick={handleLogOut} text="Log Out" />
 
-      </ul>
-
-        <div className=''>
-      <button onClick={()=>{handleLogOut()}} type="button" className=" py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-        Log Out</button>
-
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-gray-200 ml-3 focus:outline-none"
+        >
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </div>
-      </div>
-     
-      
 
-    </div>
-  </div>
-</nav>
-</div>
-  )
-}
+      {/* Mobile Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full w-64 bg-black/90 shadow-2xl transform 
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+          transition-transform duration-300 ease-in-out md:hidden z-40 backdrop-blur-md`}
+      >
+        <div className="flex justify-between items-center p-4 border-b border-gray-800">
+          <span className="text-xl font-bold text-yellow-400">MyBrand</span>
+          <button onClick={() => setIsOpen(false)}>
+            <X size={28} className="text-gray-200" />
+          </button>
+        </div>
+
+        <ul className="flex flex-col space-y-4 p-6 font-medium">
+          {navItems.map((item) => {
+            const isActive = location.pathname === `/${item.toLowerCase()}`;
+            return (
+              <li key={item}>
+                <Link
+                  to={`/${item.toLowerCase()}`}
+                  onClick={() => setIsOpen(false)}
+                  className={`relative block px-3 py-2 rounded-md transition-all duration-300
+                    ${isActive ? "text-yellow-400" : "text-gray-200 hover:text-yellow-400"}`}
+                >
+                  <span className="relative z-10">{item}</span>
+                  <span
+                    className={`absolute left-1/2 bottom-0 h-[2px] bg-yellow-400 transition-all duration-300 
+                    ${isActive ? "w-full left-0" : "w-0 group-hover:w-full group-hover:left-0"}`}
+                  ></span>
+                  <span className="absolute inset-0 rounded-md opacity-0 group-hover:opacity-20 
+                                bg-yellow-500/20 blur-sm transition duration-300"></span>
+                </Link>
+              </li>
+            );
+          })}
+          <li>
+            <RunningBorderButton onClick={handleLogOut} text="Log Out" />
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
+
+// Subtle running-border button component
+const RunningBorderButton = ({ onClick, text }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="relative inline-flex items-center px-6 py-2 text-sm font-semibold text-yellow-400 
+                 bg-black/80 rounded-full overflow-hidden focus:outline-none"
+    >
+      {/* Outer running border */}
+      <span className="absolute inset-0 rounded-full p-[2px]">
+        <span className="block w-full h-full rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400
+                         bg-[length:200%_100%] animate-run-border"></span>
+      </span>
+
+      {/* Inner mask to keep button background clean */}
+      <span className="absolute inset-0 rounded-full bg-black/80 pointer-events-none"></span>
+
+      {/* Button content */}
+      <span className="relative z-10">{text}</span>
+
+      <style>
+        {`
+          @keyframes run-border {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+          }
+          .animate-run-border {
+            animation: run-border 3s linear infinite;
+            background-size: 200% 100%;
+          }
+        `}
+      </style>
+    </button>
+  );
+};
